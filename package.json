@@ -1,0 +1,17 @@
+{
+  "name": "awsiotplugin",
+  "version": "1.0.0",
+  "description": "AWS IoT SDK Implimentation",
+  "main": "index.js",
+  "keywords": [
+    "aws",
+    "iot",
+    "cordova",
+    "android"
+  ],
+  "author": "N/A",
+  "license": "MIT",
+  "dependencies": {
+    "aws-iot-device-sdk-v2": "^1.21.1"
+  }
+}
