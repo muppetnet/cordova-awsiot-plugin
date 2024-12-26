@@ -1,5 +1,15 @@
-var exec = require('cordova/exec');
+const exec = require('cordova/exec');
 
-exports.coolMethod = function (arg0, success, error) {
-    exec(success, error, 'AWSIoTPlugin', 'coolMethod', [arg0]);
+let AWSIoTPlugin = {
+    connect: function (options, successCallback, errorCallback) {
+        exec(successCallback, errorCallback, 'AWSIoTPlugin', 'connect', [options]);
+    },
+    publish: function (message, successCallback, errorCallback) {
+        exec(successCallback, errorCallback, 'AWSIoTPlugin', 'publish', [message]);
+    },
+    subscribe: function (topic, successCallback, errorCallback) {
+        exec(successCallback, errorCallback, 'AWSIoTPlugin', 'subscribe', [topic]);
+    },
 };
+
+module.exports = AWSIoTPlugin;

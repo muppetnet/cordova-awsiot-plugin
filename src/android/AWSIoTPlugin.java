@@ -7,26 +7,44 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-/**
- * This class echoes a string called from JavaScript.
- */
+
 public class AWSIoTPlugin extends CordovaPlugin {
 
     @Override
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
-        if (action.equals("coolMethod")) {
-            String message = args.getString(0);
-            this.coolMethod(message, callbackContext);
-            return true;
+        try {
+            if (action.equals("connect")) {
+                JSONObject options = args.getJSONObject(0);
+                String endpoint = options.getString("endpoint");
+                String certPath = options.getString("certPath");
+                String keyPath = options.getString("keyPath");
+
+                MqttConnectionBuilder builder = AwsIotMqttConnectionBuilder.newMtlsBuilderFromPath(certPath, keyPath)
+                    .withEndpoint(endpoint);
+
+                this.connection = builder.build();
+                this.connection.connect().get();
+
+                callbackContext.success("Connected");
+                return true;
+            } else if (action.equals("publish")) {
+                String message = args.getString(0);
+                this.connection.publish(new PublishPacket.Builder()
+                        .topic("test/topic")
+                        .payload(message.getBytes())
+                        .build());
+                callbackContext.success("Message Published");
+                return true;
+            } else if (action.equals("subscribe")) {
+                String topic = args.getString(0);
+                this.connection.subscribe(topic, QualityOfService.AT_LEAST_ONCE, (packet) -> {
+                    callbackContext.success(new String(packet.getPayload()));
+                });
+                return true;
+            }
+        } catch (Exception e) {
+            callbackContext.error(e.getMessage());
         }
         return false;
-    }
-
-    private void coolMethod(String message, CallbackContext callbackContext) {
-        if (message != null && message.length() > 0) {
-            callbackContext.success(message);
-        } else {
-            callbackContext.error("Expected one non-empty string argument.");
-        }
     }
 }
